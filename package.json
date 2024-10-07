@@ -1,0 +1,24 @@
+{
+  "name": "csv-dbi",
+  "version": "1.0.0",
+  "description": "CSV-DBI 📊🔌 CSV Database Injector is a Node.js-based tool designed to help users quickly and efficiently insert CSV data into a database! 🚀",
+  "main": "bdUploadM.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --env-file .env app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaoCorreia/Csv-DBI.git"
+  },
+  "author": "João Carlos da Silva Correia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaoCorreia/Csv-DBI/issues"
+  },
+  "homepage": "https://github.com/jaoCorreia/Csv-DBI#readme",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "mysql2": "^3.11.3"
+  }
+}

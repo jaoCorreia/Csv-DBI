@@ -6,15 +6,18 @@ connectionController.getConnection();
 
 const query = {
     atualizar: "UPDATE tb_uc SET uc_dataInstalacao= ?, uc_nio= ?, uc_status = 1 WHERE uc_numero = ?;",
-    buscar: "SELECT * FROM tb_uc WHERE uc_numero = ?"
+    buscar: "SELECT * FROM tb_uc WHERE uc_numero = ?",
+    atualizarComOldNio: "UPDATE tb_uc SET uc_dataInstalacao= ?, old_nio=?, uc_nio= ?, uc_status = 1 WHERE uc_numero = ?;"
 }
 
 const migracaoUc = {
+
     inserirLatLong(data){
         return new Promise((resolve, reject)=>{
             try{
                 let date = new Date(data.DATA).toISOString().slice(0,10);
-                connectionController.conn.query(query.atualizar,[date,data.NIO,data.UC],(err,res)=>{
+
+                connectionController.conn.query(query.atualizarComOldNio,[date,data.OLD_NIO,data.NEW_NIO,data.UC],(err,res)=>{
                     if(err){
                         console.log(err);
                     }   
@@ -32,14 +35,15 @@ const migracaoUc = {
 async function dadosLista(){
     let i = 1
     fs.createReadStream('data.csv').pipe(parser({separator: ';',skipLines: 1}))
-    .on('data', async (dadoLinha) => {      
+    .on('data', async (dadoLinha) => {    
+
         console.log(dadoLinha);
         let inserir = await migracaoUc.inserirLatLong(dadoLinha);    
 
         if(inserir){
             console.log("inserido "+i);
-            i++;
-        }       
+            i++; 
+        }
 
     }).on('error',error=>{throw new Error (error)})
     .on('end',()=>console.log("Arquivo Lido"));

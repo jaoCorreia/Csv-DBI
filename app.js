@@ -20,11 +20,10 @@ const migracaoUc = {
                     }   
                     console.log(data);
                     resolve(true);
-                })
+                });
             }catch(err){
                 reject(err);
             }
-
         })
     }, 
 }
@@ -32,21 +31,18 @@ const migracaoUc = {
 
 async function dadosLista(){
     let i = 1
-    fs.createReadStream('data.csv').pipe(parser({separator: ';',skipLines: 1})).on('data', async (dadoLinha) => {      
-
+    fs.createReadStream('data.csv').pipe(parser({separator: ';',skipLines: 1}))
+    .on('data', async (dadoLinha) => {      
         console.log(dadoLinha);
         let inserir = await migracaoUc.inserirLatLong(dadoLinha);    
 
         if(inserir){
             console.log("inserido "+i);
-            i++
+            i++;
         }       
 
-    }).on('error', error =>{
-        console.error("ERRO AO LER CSV: ", error);
-    }).on('end', ()=>{
-        console.log("Arquivo Lido");
-    })
+    }).on('error',error=>{throw new Error (error)})
+    .on('end',()=>console.log("Arquivo Lido"));
 }
 
 dadosLista();

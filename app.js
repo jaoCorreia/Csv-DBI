@@ -1,8 +1,6 @@
-
+const connectionController = require('./connectionController');
 const parser = require('csv-parser');
 const fs = require('fs');
-const connectionController = require('./connectionController');
-
 
 connectionController.getConnection();
 
@@ -12,10 +10,8 @@ const query = {
 }
 
 const migracaoUc = {
-    
     inserirLatLong(data){
         return new Promise((resolve, reject)=>{
-
             try{
                 let date = new Date(data.DATA).toISOString().slice(0,10);
                 connectionController.conn.query(query.atualizar,[date,data.NIO,data.UC],(err,res)=>{
@@ -35,26 +31,22 @@ const migracaoUc = {
 
 
 async function dadosLista(){
+    let i = 1
+    fs.createReadStream('data.csv').pipe(parser({separator: ';',skipLines: 1})).on('data', async (dadoLinha) => {      
 
-    let i = 0
+        console.log(dadoLinha);
+        let inserir = await migracaoUc.inserirLatLong(dadoLinha);    
 
-fs.createReadStream('dadosL.csv').pipe(parser({separator: ';',skipLines: 1})).on('data', async (dadoLinha) => {      
+        if(inserir){
+            console.log("inserido "+i);
+            i++
+        }       
 
-            console.log(dadoLinha);
-            let inserir = await migracaoUc.inserirLatLong(dadoLinha);    
-     
-            if(inserir){
-                console.log("inserido "+i);
-                i++
-            }       
-
-}).on('error', error =>{
-    console.error("ERRO AO LER CSV: ", error);
-}).on('end', ()=>{
-    console.log("fim")
-})
-
-
+    }).on('error', error =>{
+        console.error("ERRO AO LER CSV: ", error);
+    }).on('end', ()=>{
+        console.log("Arquivo Lido");
+    })
 }
 
 dadosLista();

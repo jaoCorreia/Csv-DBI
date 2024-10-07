@@ -1,6 +1,6 @@
 {
   "name": "csv-dbi",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CSV-DBI 📊🔌 CSV Database Injector is a Node.js-based tool designed to help users quickly and efficiently insert CSV data into a database! 🚀",
   "main": "bdUploadM.js",
   "scripts": {

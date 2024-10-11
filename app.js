@@ -1,7 +1,6 @@
 const connectionController = require('./connectionController');
 const parser = require('csv-parser');
 const fs = require('fs');
-
 connectionController.getConnection();
 
 const query = {
@@ -30,7 +29,6 @@ const migracaoUc = {
         })
     }, 
 }
-
 
 async function dadosLista(){
     let i = 1

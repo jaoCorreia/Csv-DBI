@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/jaoCorreia/Csv-DBI#readme",
   "dependencies": {
+    "csv-dbi": "file:",
     "csv-parser": "^3.0.0",
     "mysql2": "^3.11.3"
   }

@@ -92,8 +92,6 @@ function mostrarLoader() {
             Promise.all(dataPromisse).then((res) => {
                 clearInterval(loader);
                 readline.clearLine(process.stdout,0);
-                const audic = new Audic('Untitled-12_2.mp3');
-                audic.play();
                 console.log(`\n${res.length} UCs atualizadas`);
             });
 

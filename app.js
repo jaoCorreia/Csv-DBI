@@ -50,6 +50,7 @@ const csvDbiDAO = {
         return new Promise((resolve,reject)=> {
             connectionController.conn.query(querys.atualizarEtapa,[data.ETAPA,data.UC],(err,res)=>{
                 if(err) reject(new Error(err)); 
+                console.log("inserido");
                 resolve(res);
             });
         });
@@ -79,13 +80,11 @@ function mostrarLoader() {
     let i = 1;
     let data = [];
     const opcao= op;
-    fs.createReadStream(`${arquivo}.csv`).pipe(parser({separator: ';',skipLines: 1}))
-    .on('data', async (dadoLinha) => {    
-        console.log(dadoLinha);
-        data.push(dadoLinha)
-    }).on('error',error=>{throw new Error (error)})
+    fs.createReadStream(`${arquivo}.csv`)
+    .pipe(parser({separator: ';',skipLines: 1}))
+    .on('data', async (dadoLinha) => data.push(dadoLinha))
+    .on('error',error=>{throw new Error (error)})
     .on('end',  ()=>{
-
         if(opcao == 1){
             let loader = mostrarLoader();
             let dataPromisse = data.map(d => csvDbiDAO.atualizarUc(d));
@@ -114,7 +113,6 @@ function mostrarLoader() {
             });
         }
     });
-
 }
 
 

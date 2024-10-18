@@ -16,9 +16,7 @@ const rl = readline.createInterface({
   });
 
 const querys = {
-    //Rota_leitura
     inserirRota: "INSERT INTO `eletroresolve`.`tb_rota_leitura` (`data_inicio`, `data_final`,`etapa`) VALUES (?,?,?);", 
-    //UC
     atualizarComOldNio: "UPDATE tb_uc SET uc_dataInstalacao= ?, old_nio=?, uc_nio= ?, uc_status = 1 WHERE uc_numero = ?;", 
     buscarUcPorNumero: "SELECT * FROM tb_uc where uc_numero = ?", 
     atualizarEtapa:"UPDATE tb_uc SET etapa = ? where uc_numero = ?"
@@ -50,7 +48,6 @@ const csvDbiDAO = {
         return new Promise((resolve,reject)=> {
             connectionController.conn.query(querys.atualizarEtapa,[data.ETAPA,data.UC],(err,res)=>{
                 if(err) reject(new Error(err)); 
-                console.log("inserido");
                 resolve(res);
             });
         });

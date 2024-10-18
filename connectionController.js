@@ -5,8 +5,7 @@ const connectionController = {
         host: process.env.DB_HOST, 
         user: process.env.DB_USER, 
         database: process.env.DB,
-        password: process.env.DB_PASS,   
-        connectTimeout: 10000   
+        password: process.env.DB_PASS,  
     }),
     
     getConnection(){ 

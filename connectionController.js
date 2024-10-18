@@ -24,5 +24,6 @@ const connectionController = {
     }
 }
 
+connectionController.getConnection();
 
 module.exports = connectionController;

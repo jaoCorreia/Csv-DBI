@@ -1,8 +1,8 @@
 const mysql = require('mysql2');
-console.log(process.ev.DB_HOST);
-console.log(process.ev.DB_USER);
-console.log(process.ev.DB);
-console.log(process.ev.DB_PASS);
+console.log(process.env.DB_HOST);
+console.log(process.env.DB_USER);
+console.log(process.env.DB);
+console.log(process.env.DB_PASS);
 const connectionController = {
     conn: mysql.createConnection({
         host: process.env.DB_HOST, 

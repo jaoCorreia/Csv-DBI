@@ -18,7 +18,7 @@ const rl = readline.createInterface({
 const querys = {
     inserirRota: "INSERT INTO `eletroresolve`.`tb_rota_leitura` (`data_inicio`, `data_final`,`etapa`) VALUES (?,?,?);", 
     atualizarComOldNio: "UPDATE tb_uc SET uc_dataInstalacao= ?, old_nio=?, uc_nio= ?, uc_status = 1 WHERE uc_numero = ?;", 
-    atualizarBaseUc: "UPDATE tb_uc SET etapa= ? regiao= ?, disjuntor= ?,complemento= ?,referencia= ?, uc_bairro = ? WHERE uc_numero = ?;", 
+    atualizarBaseUc: "UPDATE tb_uc SET etapa= ?, regiao= ?, disjuntor= ?,complemento= ?,referencia= ?, uc_bairro = ? WHERE uc_numero = ?;", 
     inserirUC: "INSERT INTO tb_uc (uc_numero, uc_idpro, uc_lat, uc_long, uc_status, uc_nio, uc_tipo, uc_endereco, "+
                "uc_bairro, uc_cidade, old_nio, etapa, regiao, disjuntor, referencia, complemento) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", 
     inserirProprietario: "INSERT INTO tb_uc (pro_email, pro_telegon)",
@@ -85,6 +85,7 @@ const csvDbiDAO = {
     // },
 
     atualizarBase(data){
+        console.log(data);
         return new Promise((resolve,reject)=> {
             connectionController.conn.query(querys.atualizarBaseUc,[data.ETAPA, data.REGIAO, data.DISJUNTOR, 
                 data.COMPLEMENTO, data.REFERENCIA, data.BAIRRO, data.UC],(err,res)=>{
@@ -134,15 +135,6 @@ function mostrarLoader() {
 
         }else if(opcao == 3){
             let loader = mostrarLoader();
-            let dataPromisse = data.map(d => csvDbiDAO.atualizarEtapa(d));
-            Promise.all(dataPromisse).then((res)=>{
-                clearInterval(loader);
-                readline.clearLine(process.stdout,0);
-                console.log(`\n${res.length} UCs atualizadas`)
-            });
-
-        }else if(opcao == 4){
-            let loader = mostrarLoader();
             let dataPromisse = data.map(d => csvDbiDAO.atualizarBase(d));
             Promise.all(dataPromisse).then((res)=>{
                 clearInterval(loader);
@@ -150,20 +142,21 @@ function mostrarLoader() {
                 console.log(`\n${res.length} UCs atualizadas`)
             });
 
-        }else if(opcao == 5){
-            let loader = mostrarLoader();
-            let dataPromisse = data.map(d => csvDbiDAO.atualizarBase(d));
-            Promise.all(dataPromisse).then((res)=>{
-                clearInterval(loader);
-                readline.clearLine(process.stdout,0);
-                console.log(`\n${res.length} UCs atualizadas`)
-            });
+        // }else if(opcao == 4){
+        //     let loader = mostrarLoader();
+        //     let dataPromisse = data.map(d => csvDbiDAO.atualizarBase(d));
+        //     Promise.all(dataPromisse).then((res)=>{
+        //         clearInterval(loader);
+        //         readline.clearLine(process.stdout,0);
+        //         console.log(`\n${res.length} UCs atualizadas`)
+        //     });
         }
+        
     });
 }
 
 
-rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com old_nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n4.Inserir a UC\n', (op) => {
+rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com old_nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n', (op) => {
     const opcao = op; 
     if(parseInt(opcao)){
         rl.question('Insira o nome do arquivo:\n',async (arquivo)=>{

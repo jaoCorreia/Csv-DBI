@@ -2,6 +2,7 @@ const readline = require('readline');
 const connectionController = require('./connectionController');
 const parser = require('csv-parser');
 const fs = require('fs');
+const { rejects } = require('assert');
 const logo = `+--------------------------------------------------------+
 |..%%%%....%%%%...%%..%%..........%%%%%...%%%%%...%%%%%%.|
 |.%%..%%..%%......%%..%%..........%%..%%..%%..%%....%%...|
@@ -20,11 +21,11 @@ const querys = {
     atualizarComOldNio: "UPDATE tb_uc SET uc_dataInstalacao= ?, old_nio=?, uc_nio= ?, uc_status = 1 WHERE uc_numero = ?;", 
     atualizarBaseUc: "UPDATE tb_uc SET etapa= ?, regiao= ?, disjuntor= ?,complemento= ?,referencia= ?, uc_bairro = ? WHERE uc_numero = ?;", 
     atualizarBaseUcSemDisjuntor: "UPDATE tb_uc SET etapa= ?, regiao= ?,complemento= ?,referencia= ?, uc_bairro = ? WHERE uc_numero = ?;", 
-    inserirUC: "INSERT INTO tb_uc (uc_numero, uc_idpro, uc_lat, uc_long, uc_status, uc_nio, uc_tipo, uc_endereco, "+
-               "uc_bairro, uc_cidade, old_nio, etapa, regiao, disjuntor, referencia, complemento) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", 
-    inserirProprietario: "INSERT INTO tb_uc (pro_email, pro_telegon)",
+    inserirUC: "INSERT INTO `eletroresolve`.`tb_uc` (`uc_numero`, `uc_idpro`, `uc_lat`, `uc_long`, `uc_tipo`, `uc_endereco`, `uc_bairro`, `uc_cidade`, `etapa`, `regiao`, `disjuntor`, `referencia`, `complemento`)"+ 
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+    inserirProprietario: "INSERT INTO tb_proprietario  (pro_email, pro_telefone, pro_nome) VALUES (?,?,?)",
     buscarUcPorNumero: "SELECT * FROM tb_uc where uc_numero = ?", 
-    atualizarEtapa:"UPDATE tb_uc SET etapa = ? where uc_numero = ?"
+    atualizarEtapa:"UPDATE tb_uc SET etapa = ? where uc_numero = ?", 
 }
 
 const csvDbiDAO = {
@@ -58,6 +59,17 @@ const csvDbiDAO = {
         });
     },
 
+    inserirUc(data, idProp){
+        return new Promise((resolve, reject)=> {
+            idProp = idProp.insertId
+            connectionController.conn.query(querys.inserirUC,[data.UC, idProp, data.Latitude, data.Longitude, data.LIGACAO, data.ENDERECO, 
+                data.BAIRRO, data.MUNICIPIO, data.ETAPA, data.LOCAL, data.DISJUNTOR, data.REFERENCIA, data.COMPLEMENTO],(err,res)=>{
+                if(err) reject(new Error("Erro ao inserir UC: "+err)); 
+                resolve(res);
+            });
+        });
+    },
+
     buscarUcPorNumero(uc){
         return new Promise((resolve,reject)=> {
             connectionController.conn.query(querys.buscarUcPorNumero,[uc],(err,res)=>{
@@ -69,22 +81,14 @@ const csvDbiDAO = {
     
     inserirProprietario(data){
         return new Promise((resolve,reject)=> {
-            connectionController.conn.query(querys.buscarUcPorNumero,[uc],(err,res)=>{
+            console.log(data.EMAIL);
+            connectionController.conn.query(querys.inserirProprietario,[data.EMAIL,data.TELEFONE,data.NOME],(err,res)=>{
                 if(err) reject(new Error(err)); 
                 resolve(res);
             });
         });
     },
   
-    // inserirUC(data){
-    //     return new Promise((resolve,reject)=> {
-    //         connectionController.conn.query(querys.buscarUcPorNumero,[uc],(err,res)=>{
-    //             if(err) reject(new Error(err)); 
-    //             resolve(res);
-    //         });
-    //     });
-    // },
-
     atualizarBase(data){
         return new Promise((resolve,reject)=> {
             if(!data.DISJUNTOR == ""){
@@ -150,21 +154,27 @@ function mostrarLoader() {
                 console.log(`\n${res.length} UCs atualizadas`)
             });
 
-        // }else if(opcao == 4){
-        //     let loader = mostrarLoader();
-        //     let dataPromisse = data.map(d => csvDbiDAO.atualizarBase(d));
-        //     Promise.all(dataPromisse).then((res)=>{
-        //         clearInterval(loader);
-        //         readline.clearLine(process.stdout,0);
-        //         console.log(`\n${res.length} UCs atualizadas`)
-        //     });
+        }else if(opcao == 4){
+            let loader = mostrarLoader();
+            let dataPromisse = data.map(async (d) => {
+                let idProp  = await csvDbiDAO.inserirProprietario(d); 
+                return csvDbiDAO.inserirUc(d,idProp);
+            });
+            Promise.all(dataPromisse).then((res)=>{
+                clearInterval(loader);
+                readline.clearLine(process.stdout,0);
+                console.log(`\n${res.length} UCs atualizadas`)
+            });
+        }else{
+            console.log("Digito Invalido");
+            process.exit; 
         }
         
     });
 }
 
 
-rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com old_nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n', (op) => {
+rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com old_nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n4.Inserir UCs\n', (op) => {
     const opcao = op; 
     if(parseInt(opcao)){
         rl.question('Insira o nome do arquivo:\n',async (arquivo)=>{

@@ -87,7 +87,8 @@ const csvDbiDAO = {
 
     atualizarBase(data){
         return new Promise((resolve,reject)=> {
-            if(data.DISJUNTOR == ''){
+            if(data.DISJUNTOR == " "){
+                console.log(data.DISJUNTOR);
                 connectionController.conn.query(querys.atualizarBaseUc,[data.ETAPA, data.REGIAO, data.DISJUNTOR, 
                     data.COMPLEMENTO, data.REFERENCIA, data.BAIRRO, data.UC],(err,res)=>{
                     if(err) reject(new Error(err)); 

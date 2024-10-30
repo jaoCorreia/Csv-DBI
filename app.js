@@ -19,6 +19,7 @@ const querys = {
     inserirRota: "INSERT INTO `eletroresolve`.`tb_rota_leitura` (`data_inicio`, `data_final`,`etapa`) VALUES (?,?,?);", 
     atualizarComOldNio: "UPDATE tb_uc SET uc_dataInstalacao= ?, old_nio=?, uc_nio= ?, uc_status = 1 WHERE uc_numero = ?;", 
     atualizarBaseUc: "UPDATE tb_uc SET etapa= ?, regiao= ?, disjuntor= ?,complemento= ?,referencia= ?, uc_bairro = ? WHERE uc_numero = ?;", 
+    atualizarBaseUcSemDisjuntor: "UPDATE tb_uc SET etapa= ?, regiao= ?,complemento= ?,referencia= ?, uc_bairro = ? WHERE uc_numero = ?;", 
     inserirUC: "INSERT INTO tb_uc (uc_numero, uc_idpro, uc_lat, uc_long, uc_status, uc_nio, uc_tipo, uc_endereco, "+
                "uc_bairro, uc_cidade, old_nio, etapa, regiao, disjuntor, referencia, complemento) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", 
     inserirProprietario: "INSERT INTO tb_uc (pro_email, pro_telegon)",
@@ -66,14 +67,14 @@ const csvDbiDAO = {
         });
     },
     
-    // inserirProprietario(data){
-    //     return new Promise((resolve,reject)=> {
-    //         connectionController.conn.query(querys.buscarUcPorNumero,[uc],(err,res)=>{
-    //             if(err) reject(new Error(err)); 
-    //             resolve(res);
-    //         });
-    //     });
-    // },
+    inserirProprietario(data){
+        return new Promise((resolve,reject)=> {
+            connectionController.conn.query(querys.buscarUcPorNumero,[uc],(err,res)=>{
+                if(err) reject(new Error(err)); 
+                resolve(res);
+            });
+        });
+    },
   
     // inserirUC(data){
     //     return new Promise((resolve,reject)=> {
@@ -86,11 +87,19 @@ const csvDbiDAO = {
 
     atualizarBase(data){
         return new Promise((resolve,reject)=> {
-            connectionController.conn.query(querys.atualizarBaseUc,[data.ETAPA, data.REGIAO, data.DISJUNTOR, 
-                data.COMPLEMENTO, data.REFERENCIA, data.BAIRRO, data.UC],(err,res)=>{
-                if(err) reject(new Error(err)); 
-                resolve(res);
-            })
+            if(data.DISJUNTOR == ''){
+                connectionController.conn.query(querys.atualizarBaseUc,[data.ETAPA, data.REGIAO, data.DISJUNTOR, 
+                    data.COMPLEMENTO, data.REFERENCIA, data.BAIRRO, data.UC],(err,res)=>{
+                    if(err) reject(new Error(err)); 
+                    resolve(res);
+                })
+            }else{
+                connectionController.conn.query(querys.atualizarBaseUcSemDisjuntor,[data.ETAPA, data.REGIAO, 
+                    data.COMPLEMENTO, data.REFERENCIA, data.BAIRRO, data.UC],(err,res)=>{
+                    if(err) reject(new Error(err)); 
+                    resolve(res);
+                })
+            }
         })
     }
 }

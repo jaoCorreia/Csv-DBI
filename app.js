@@ -31,6 +31,7 @@ const querys = {
 const csvDbiDAO = {
     atualizarUc(data){
         return new Promise((resolve, reject)=>{
+            console.log(data);
             let date = new Date(data.DATA).toISOString().slice(0,10);
             connectionController.conn.query(querys.atualizarComOldNio,[date,data.OLD_NIO,data.NEW_NIO,data.UC],(err,res)=>{
                 if(err) throw reject(new Error(err));

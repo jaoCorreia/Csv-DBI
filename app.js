@@ -26,6 +26,7 @@ const querys = {
     inserirProprietario: "INSERT INTO tb_proprietario  (pro_email, pro_telefone, pro_nome) VALUES (?,?,?)",
     buscarUcPorNumero: "SELECT * FROM tb_uc where uc_numero = ?", 
     atualizarEtapa:"UPDATE tb_uc SET etapa = ? where uc_numero = ?", 
+    atualizarOldNio:"UPDATE tb_uc SET old_nio = ? where uc_numero = ?", 
 }
 
 const csvDbiDAO = {
@@ -105,6 +106,15 @@ const csvDbiDAO = {
                 });
             }
         });
+    }, 
+
+    atualizarOldNio(data){
+        return new Promise((resolve,reject)=>{
+            connectionController.conn.query(querys.atualizarOldNio,[data.NIO, data.UC],(err,res)=>{
+                if(err) reject(new Error(err)); 
+                resolve(res);
+            });
+        });
     }
 }
 
@@ -135,7 +145,6 @@ function mostrarLoader() {
                 readline.clearLine(process.stdout,0);
                 console.log(`\n${res.length} UCs atualizadas`);
             });
-
         }else if(opcao == 2){
             let loader = mostrarLoader();
             let dataPromisse = data.map(d => csvDbiDAO.inserirRota(d));
@@ -144,7 +153,6 @@ function mostrarLoader() {
                 readline.clearLine(process.stdout,0);
                 console.log(`\n${res.length} Rotas inseridas`)
             });
-
         }else if(opcao == 3){
             let loader = mostrarLoader();
             let dataPromisse = data.map(d => csvDbiDAO.atualizarBase(d));
@@ -153,7 +161,6 @@ function mostrarLoader() {
                 readline.clearLine(process.stdout,0);
                 console.log(`\n${res.length} UCs atualizadas`)
             });
-
         }else if(opcao == 4){
             let loader = mostrarLoader();
             let dataPromisse = data.map(async (d) => {
@@ -165,16 +172,23 @@ function mostrarLoader() {
                 readline.clearLine(process.stdout,0);
                 console.log(`\n${res.length} UCs atualizadas`)
             });
+        }else if(opcao == 5){
+            let loader = mostrarLoader();
+            let dataPromisse = data.map(d => csvDbiDAO.atualizarOldNio(d));
+            Promise.all(dataPromisse).then((res)=>{
+                clearInterval(loader);
+                readline.clearLine(process.stdout,0);
+                console.log(`\n${res.length} Oldnio inseridos`)
+            });
         }else{
             console.log("Digito Invalido");
             process.exit; 
         }
-        
     });
 }
 
 
-rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com old_nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n4.Inserir UCs\n', (op) => {
+rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com old_nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n4.Inserir UCs\n5.Atualizar OldNio\n', (op) => {
     const opcao = op; 
     if(parseInt(opcao)){
         rl.question('Insira o nome do arquivo:\n',async (arquivo)=>{

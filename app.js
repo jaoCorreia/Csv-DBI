@@ -187,7 +187,6 @@ function mostrarLoader() {
     });
 }
 
-
 rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com old_nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n4.Inserir UCs\n5.Atualizar OldNio\n', (op) => {
     const opcao = op; 
     if(parseInt(opcao)){

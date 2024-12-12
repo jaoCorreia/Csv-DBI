@@ -19,6 +19,7 @@ const rl = readline.createInterface({
 const querys = {
     inserirRota: "INSERT INTO `eletroresolve`.`tb_rota_leitura` (`data_inicio`, `data_final`,`etapa`) VALUES (?,?,?);", 
     atualizarComOldNio: "UPDATE tb_uc SET uc_dataInstalacao= ?, old_nio=?, uc_nio= ?, uc_status = 1 WHERE uc_numero = ?;", 
+    atualizarStatus: "UPDATE tb_uc SET uc_dataInstalacao= ?, uc_nio= ?, uc_status = 1 WHERE uc_numero = ?;", 
     atualizarBaseUc: "UPDATE tb_uc SET etapa= ?, regiao= ?, disjuntor= ?,complemento= ?,referencia= ?, uc_bairro = ? WHERE uc_numero = ?;", 
     atualizarBaseUcSemDisjuntor: "UPDATE tb_uc SET etapa= ?, regiao= ?,complemento= ?,referencia= ?, uc_bairro = ? WHERE uc_numero = ?;", 
     inserirUC: "INSERT INTO `eletroresolve`.`tb_uc` (`uc_numero`, `uc_idpro`, `uc_lat`, `uc_long`, `uc_tipo`, `uc_endereco`, `uc_bairro`, `uc_cidade`, `etapa`, `regiao`, `disjuntor`, `referencia`, `complemento`)"+ 
@@ -33,7 +34,7 @@ const csvDbiDAO = {
     atualizarUc(data){
         return new Promise((resolve, reject)=>{
             let date = new Date(data.DATA).toISOString().slice(0,10);
-            connectionController.conn.query(querys.atualizarComOldNio,[date,data.OLD_NIO,data.NEW_NIO,data.UC],(err,res)=>{
+            connectionController.conn.query(querys.atualizarStatus,[date,data.NIO,data.UC],(err,res)=>{
                 if(err) throw reject(new Error(err));
                 resolve(res);
             });
@@ -74,7 +75,7 @@ const csvDbiDAO = {
     buscarUcPorNumero(uc){
         return new Promise((resolve,reject)=> {
             connectionController.conn.query(querys.buscarUcPorNumero,[uc],(err,res)=>{
-                if(err) reject(new Error(err)); 
+                if(err) reject(new Error(err));  
                 resolve(res);
             });
         });

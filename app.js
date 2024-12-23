@@ -28,6 +28,9 @@ const querys = {
     buscarUcPorNumero: "SELECT * FROM tb_uc where uc_numero = ?", 
     atualizarEtapa:"UPDATE tb_uc SET etapa = ? where uc_numero = ?", 
     atualizarOldNio:"UPDATE tb_uc SET old_nio = ? where uc_numero = ?", 
+    atualizarCadastroInstalador: "UPDATE tb_instalador SET cpf = ? where tb_instalador.nome = ? ",
+    atualizarStatusInstalador: "UPDATE tb_instalador SET status = ? where tb_instalador.nome = ?",
+
 }
 
 const csvDbiDAO = {
@@ -116,7 +119,26 @@ const csvDbiDAO = {
                 resolve(res);
             });
         });
-    }
+    }, 
+    
+    atualizarStatusInstalador(data){
+        return new Promise((resolve,reject)=>{
+            connectionController.conn.query(querys.atualizarStatusInstalador,[1, data.NOME],(err,res)=>{
+                if(err) reject(new Error(err)); 
+                resolve(res);
+            });
+        });
+    }, 
+
+    atualizarCadastroInstalador(data){
+        return new Promise((resolve,reject)=>{
+            connectionController.conn.query(querys.atualizarCadastroInstalador,[data.CPF, data.NOME],(err,res)=>{
+                if(err) reject(new Error(err)); 
+                resolve(res);
+            });
+        });
+    }, 
+ 
 }
 
 function mostrarLoader() {
@@ -181,6 +203,23 @@ function mostrarLoader() {
                 readline.clearLine(process.stdout,0);
                 console.log(`\n${res.length} Oldnio inseridos`)
             });
+
+        }else if(opcao == 6){
+            let loader = mostrarLoader();
+            let dataPromisse = data.map(d => csvDbiDAO.atualizarCadastroInstalador(d));
+            Promise.all(dataPromisse).then((res)=>{
+                clearInterval(loader);
+                readline.clearLine(process.stdout,0);
+                console.log(`\n${res.length} cpf atualizados`);
+            });
+        }else if(opcao == 7){
+            let loader = mostrarLoader();
+            let dataPromisse = data.map(d => csvDbiDAO.atualizarStatusInstalador(d));
+            Promise.all(dataPromisse).then((res)=>{
+                clearInterval(loader);
+                readline.clearLine(process.stdout,0);
+                console.log(`\n${res.length} atualizar status`);
+            });
         }else{
             console.log("Digito Invalido");
             process.exit; 
@@ -188,7 +227,8 @@ function mostrarLoader() {
     });
 }
 
-rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com old_nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n4.Inserir UCs\n5.Atualizar OldNio\n', (op) => {
+rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n4.Inserir UCs\n5.Atualizar OldNio\n'+
+    '6.Atualizar Cadastro instalador\n7.Atualizar status instalador\n', (op) => {
     const opcao = op; 
     if(parseInt(opcao)){
         rl.question('Insira o nome do arquivo:\n',async (arquivo)=>{

@@ -146,7 +146,7 @@ const csvDbiDAO = {
             
             const results = await Promise.all(res.map(async (instalador) => {
                 try {
-                    const response = await fetch('http://localhost:3000/user', {
+                    const response = await fetch(`${process.env.ENDPOINT}/user`, {
                         headers: { "Content-Type": "application/json" },
                         method: "POST",
                         body: JSON.stringify({

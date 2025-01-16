@@ -30,6 +30,7 @@ const querys = {
     atualizarOldNio:"UPDATE tb_uc SET old_nio = ? where uc_numero = ?", 
     atualizarCadastroInstalador: "UPDATE tb_instalador SET cpf = ? where tb_instalador.nome = ? ",
     atualizarStatusInstalador: "UPDATE tb_instalador SET status = ? where tb_instalador.nome = ?",
+    instaladores: "SELECT * FROM tb_instalador where status = 0"
 
 }
 
@@ -139,7 +140,46 @@ const csvDbiDAO = {
         });
     }, 
 
+    async criarUsuarioInstalador() {
+        try {
+            const [res] = await connectionController.conn.promise().query(querys.instaladores);
+            
+            const results = await Promise.all(res.map(async (instalador) => {
+                try {
+                    const response = await fetch('http://localhost:3000/user', {
+                        headers: { "Content-Type": "application/json" },
+                        method: "POST",
+                        body: JSON.stringify({
+                            installerId: instalador.id,
+                            user: instalador.cpf,
+                            password: "eletromil@25",
+                            position: 13   
+                        })
+                    });
     
+                    if (!response.ok) {
+                        throw new Error(`Erro na criação do usuário: ${response.statusText}`);
+                    }
+    
+                    return await response.json();
+                } catch (error) {
+                    console.error(`Erro ao processar instalador ${instalador.id}:`, error);
+                    return null; 
+                }
+            }));
+    
+            console.log(results.filter(result => result !== null)); 
+            return results;
+        } catch (error) {
+            console.error("Erro ao buscar instaladores:", error);
+            throw error;
+        }
+    }
+    
+
+
+
+
  
 }
 
@@ -153,10 +193,11 @@ function mostrarLoader() {
     }, 200); 
 }
   
- function csvDbiController(arquivo, op){
+ async function csvDbiController(arquivo, op){
     let i = 1;
     let data = [];
     const opcao= op;
+
     fs.createReadStream(`${arquivo}.csv`)
     .pipe(parser({separator: ';',skipLines: 1}))
     .on('data', async (dadoLinha) => data.push(dadoLinha))
@@ -222,6 +263,7 @@ function mostrarLoader() {
                 readline.clearLine(process.stdout,0);
                 console.log(`\n${res.length} atualizar status`);
             });
+        
         }else{
             console.log("Digito Invalido");
             process.exit; 
@@ -232,12 +274,21 @@ function mostrarLoader() {
 rl.question(logo+'\nMenu de opção Csv-DBI\n1.Atualizar status uc (com nio)\n2.Inserir rota de leitura\n3.Atualizar a base de UCs\n4.Inserir UCs\n5.Atualizar OldNio\n'+
     '6.Atualizar Cadastro instalador\n7.Atualizar status instalador\n', (op) => {
     const opcao = op; 
-    if(parseInt(opcao)){
+    if(parseInt(opcao) != 8){
         rl.question('Insira o nome do arquivo:\n',async (arquivo)=>{
             rl.close();   
             await connectionController.getConnection();
             csvDbiController(arquivo,opcao);
         });
+    }else if(opcao == 8){
+        let criarUsuario = async () =>{
+            console.log("CRIANDO USUARIOS");
+            await csvDbiDAO.criarUsuarioInstalador()
+            console.log("USUARIOS CRIADOS");
+        }
+        criarUsuario();
+
+
     }else{
         throw new Error("Opção Invalida!");
     }

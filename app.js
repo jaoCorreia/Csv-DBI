@@ -150,7 +150,7 @@ const csvDbiDAO = {
                         headers: { "Content-Type": "application/json" },
                         method: "POST",
                         body: JSON.stringify({
-                            installerId: instalador.id,
+                            installerId: instalador.id_instalador,
                             user: instalador.cpf,
                             password: "eletromil@25",
                             position: 13   

@@ -68,7 +68,7 @@ const csvDbiDAO = {
     inserirUc(data, idProp){
         return new Promise((resolve, reject)=> {
             idProp = idProp.insertId
-            connectionController.conn.query(querys.inserirUC,[data.UC, idProp, data.Latitude, data.Longitude, data.LIGACAO, data.ENDERECO, 
+            connectionController.conn.query(querys.inserirUC,[data.UC, idProp, data.LAT, data.LONG, data.LIGACAO, data.ENDERECO, 
                 data.BAIRRO, data.MUNICIPIO, data.ETAPA, data.LOCAL, data.DISJUNTOR, data.REFERENCIA, data.COMPLEMENTO],(err,res)=>{
                 if(err) reject(new Error("Erro ao inserir UC: "+err)); 
                 resolve(res);
@@ -87,7 +87,7 @@ const csvDbiDAO = {
     
     inserirProprietario(data){
         return new Promise((resolve,reject)=> {
-            console.log(data.EMAIL);
+            console.log()
             connectionController.conn.query(querys.inserirProprietario,[data.EMAIL,data.TELEFONE,data.NOME],(err,res)=>{
                 if(err) reject(new Error(err)); 
                 resolve(res);

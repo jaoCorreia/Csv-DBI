@@ -1,0 +1,39 @@
+{
+    "input": "data.csv",
+    "database": {
+        "type": "mysql",
+        "host": "localhost",
+        "user": "root",
+        "password": "root",
+        "database": "eletroresolve"
+    },
+    "csv": {
+        "separator": ";",
+        "skipLines": 1
+    },
+    "tables": {
+        "tb_uc": {
+            "primaryKey": "UC",
+            "exists": {
+                "query": "SELECT 1 FROM tb_uc WHERE uc_numero = ?",
+                "paramFrom": "UC"
+            },
+            "insert": {
+                "query": "INSERT INTO tb_uc (uc_numero, uc_bairro) VALUES (?, ?)",
+                "params": [
+                    "UC",
+                    "BAIRRO"
+                ]
+            },
+            "update": {
+                "query": "UPDATE tb_uc SET uc_bairro = ? WHERE uc_numero = ?",
+                "params": [
+                    "BAIRRO",
+                    "UC"
+                ]
+            },
+            "onExists": "update",
+            "onNotExists": "insert"
+        }
+    }
+}
